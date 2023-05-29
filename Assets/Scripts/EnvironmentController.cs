@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class EnvironmentController : MonoBehaviour
 {
@@ -9,6 +10,9 @@ public class EnvironmentController : MonoBehaviour
     public float growthSpreadFrequency;
     public float growthSpreadMultInlimbo = 2f;
     public GrowthPiece growthPrefab;
+    public float maxGrowth = 200;
+    public Volume volume;
+    public Cinemachine.CinemachineVirtualCamera cmr;
 
     [Tooltip("Object assigned here will be destroyed and replaced with growth!")]
     public List<Transform> growthInitialPositions;
@@ -38,12 +42,16 @@ public class EnvironmentController : MonoBehaviour
         if (!LimboMode)
         {
             CurrentLimboEnergy = Mathf.Clamp(CurrentLimboEnergy + Time.deltaTime * limboRechargeSpeed, 0, maxLimboDuration);
-
+            volume.weight = 0;
+            cmr.m_Lens.FieldOfView = 60;
         }
         else
         {
+            volume.weight = 1;
+            cmr.m_Lens.FieldOfView = 80;
+
             CurrentLimboEnergy -= Time.deltaTime;
-            if(CurrentLimboEnergy <= 0f)
+            if (CurrentLimboEnergy <= 0f)
             {
                 ToggleLimbo();
             }
@@ -78,6 +86,11 @@ public class EnvironmentController : MonoBehaviour
 
     private void InitGrowth(Vector3 position)
     {
+        if(growthList.Count > maxGrowth)
+        {
+            return;
+        }
+
         GrowthPiece growth = Instantiate(growthPrefab, position, Quaternion.identity, transform);
         growthList.Add(growth);
         openGrowthList.Add(growth);

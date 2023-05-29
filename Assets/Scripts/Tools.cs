@@ -46,6 +46,15 @@ public class Tools
                 return Vector3.zero;
         }
     }
+
+    public static int RepeatInt(int value, int range)
+    {
+        if (range == 0)
+            return 0;
+
+        int result = value % range;
+        return result >= 0 ? result : result + range;
+    }
 }
 
 public static class ListExtensions
